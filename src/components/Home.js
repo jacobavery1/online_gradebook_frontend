@@ -1,9 +1,12 @@
 import { DataGrid } from '@mui/x-data-grid'
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import utils from '../utils/utils'
 
 export default function Home() {
     const [students, setStudents] = useState([])
+
+    const navigate = useNavigate()
 
     useEffect(() => {
         (async () => {
@@ -23,18 +26,13 @@ export default function Home() {
     return (
         <div style={{height: 650, width: '100%'}}>
             <DataGrid
-                sx={{
-                    boxShadow: 2, 
-                    '& .MuiDataGrid-row:nth-of-type(even)': {
-                        backgroundColor: "lightblue"
-                    }
-                }}
+                sx={utils.sxProp}
                 rowHeight={25}
                 rows={students}
                 columns={columns}
                 getRowId={(row) => row.student_id}
                 onCellClick={(params, event) => {
-                    console.log(params.row)
+                    navigate(`/${params.row.student_id}`)
                 }}
             />
         </div>
