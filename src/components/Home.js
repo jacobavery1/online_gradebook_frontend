@@ -31,7 +31,7 @@ export default function Home() {
                 rows={students}
                 columns={columns}
                 getRowId={(row) => row.student_id}
-                onCellClick={(params, event) => {
+                onCellDoubleClick={(params, event) => {
                     navigate(`/${params.row.student_id}`)
                 }}
             />
