@@ -95,6 +95,7 @@ export default function Individual() {
 
         if (allOk) {
             //console.log(addedData)
+            //console.log(gradeModalProps.assignment_id)
             const update = await utils.updateAssignment(gradeModalProps.assignment_id, gradeModalProps)
             //console.log(update)
 
