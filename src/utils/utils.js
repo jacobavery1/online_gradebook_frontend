@@ -54,6 +54,11 @@ const utils = {
         return val
     },
 
+    addPerson: async (person) => {
+        const { data } = axios.post('/students/addStudent', person)
+        return data 
+    }, 
+
     sxProp: {
         boxShadow: 2, 
         '& .MuiDataGrid-row:nth-of-type(even)': {

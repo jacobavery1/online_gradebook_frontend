@@ -20,6 +20,14 @@ export default function Individual() {
         assignment_id: ''
     }
 
+    const defaultObjII = {
+        assignment_date: '', 
+        assignment_grade: '', 
+        assignment_name: '', 
+        class_name: '', 
+        semester: ''
+    }
+
     const [assignments, setAssignments] = useState([])
     const [student, setStudent] = useState({})
 
@@ -29,6 +37,10 @@ export default function Individual() {
     const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
     const [deleteItem, setDeleteItem] = useState('')
+
+    const [editModalOpen, setEditModalOpen] = useState(false)
+
+    const [addedData, setAddedData] = useState(defaultObjII)
 
     //const [editModalOpen, setEditModalOpen]
     
@@ -40,7 +52,7 @@ export default function Individual() {
             const data2 = await utils.getStudent(id)
             setStudent(data2)
         })() 
-    }, [deleteItem, gradeModalProps])
+    }, [deleteItem, gradeModalProps, addedData])
 
     const columns = [
         { field: 'class_name', headerName: 'Class Name', width: 250 }, 
@@ -104,6 +116,33 @@ export default function Individual() {
         setDeleteModalOpen(false)
     }
 
+    
+    
+
+    // will add in a new assignment and update the data from here calling to the api and then refreshing the page 
+    
+
+    async function onSubmit() {
+        let allOk = true 
+        for (const property in addedData) {
+            if (addedData[property] == '') {
+                alert('please fill out all fields')
+                allOk = false
+                break 
+            }
+        }
+
+        if (allOk) {
+            //console.log(addedData)
+            const added = await utils.addAssignment(id, addedData)
+            //console.log(added)
+
+            setAddedData(defaultObjII)
+            setEditModalOpen(false)
+            //console.log(addedData)
+        }
+    }
+
 
     return (
         <div style={{ height: 550, width: '100%', fontFamily: 'Roboto' }}>
@@ -116,7 +155,8 @@ export default function Individual() {
                 rowHeight={25}
                 columns={columns}
                 sx={utils.sxProp}
-                components={{Toolbar: CustomToolbar}}
+                components={{ Toolbar: CustomToolbar }}
+                componentsProps={{toolbar: {editModalOpen, setEditModalOpen, addedData, setAddedData, onSubmit}}}
             />
             <GradeModal
                 editModalOpen={gradeModalOpen}
