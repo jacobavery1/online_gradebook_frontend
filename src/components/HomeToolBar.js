@@ -2,15 +2,16 @@ import { GridToolbarContainer } from "@mui/x-data-grid"
 import { styled } from "@mui/system"
 import { Button, Paper, TextField, Modal, MenuItem } from "@mui/material"
 import AddIcon from '@mui/icons-material/Add';
+import utils from '../utils/utils'
 
 
 export default function HomeToolBar({ addedPerson, setAddedPerson, modalOpen, setModalOpen, addPersonToDB }) {
+    /* props passed from home.sj */
+    
     const OptionButton = styled(Button)(() => ({
         backgroundColor: 'lightblue'
     }))
 
-    
-    
     return (
         <GridToolbarContainer>
             <OptionButton onClick={() => setModalOpen(!modalOpen)}><AddIcon /> Add</OptionButton>
@@ -19,18 +20,7 @@ export default function HomeToolBar({ addedPerson, setAddedPerson, modalOpen, se
                 onClose={() => setModalOpen(false)}
             >
                 <Paper
-                    sx={{
-                        position: 'absolute', 
-                        top: '50%', 
-                        left: '50%', 
-                        transform: 'translate(-50%, -50%)',
-                        width: 550, 
-                        bgcolor: 'whitesmoke',
-                        padding: 5, 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        gap: 2
-                    }}
+                    sx={{...utils.paperSxProps, gap: 2}}
                 >
                     <TextField
                         label="Last name"

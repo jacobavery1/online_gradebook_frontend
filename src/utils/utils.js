@@ -64,6 +64,49 @@ const utils = {
         '& .MuiDataGrid-row:nth-of-type(even)': {
             backgroundColor: "lightblue"
         }
+    }, 
+
+    defaultObj: {
+        assignment_date: '', 
+        assignment_grade: '', 
+        assignment_name: '', 
+        class_name: '', 
+        semester: '', 
+        assignment_id: ''
+    },
+
+    defaultObjII: {
+        assignment_date: '', 
+        assignment_grade: '', 
+        assignment_name: '', 
+        class_name: '', 
+        semester: ''
+    }, 
+
+    studentSchemaObj: {
+        last_name: '', 
+        first_name: '', 
+        grade_level: '', 
+        student_email: ''
+    },
+
+    paperSxProps: {
+        position: 'absolute', 
+        top: '50%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)',
+        width: 550, 
+        bgcolor: 'whitesmoke',
+        padding: 5, 
+        display: 'flex', 
+        flexDirection: 'column'
+    }, 
+
+    gradeModalDivStyle: {
+        display: 'flex', 
+        justifyContent: 'center',
+        margin: 20, 
+        gap: 10
     }
 }
 

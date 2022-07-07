@@ -1,4 +1,4 @@
-import { Typography, IconButton, Modal, Paper, Button } from "@mui/material"
+import { IconButton, Modal, Paper, Button } from "@mui/material"
 import { DataGrid } from "@mui/x-data-grid"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
@@ -8,41 +8,34 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import GradeModal from "./GradeModal"
 
+
 export default function Individual() {
     const { id } = useParams()
 
-    const defaultObj = {
-        assignment_date: '', 
-        assignment_grade: '', 
-        assignment_name: '', 
-        class_name: '', 
-        semester: '', 
-        assignment_id: ''
-    }
+    const defaultObj = utils.defaultObj
+    const defaultObjII = utils.defaultObjII
 
-    const defaultObjII = {
-        assignment_date: '', 
-        assignment_grade: '', 
-        assignment_name: '', 
-        class_name: '', 
-        semester: ''
-    }
-
+    // all assignments associated with the student 
     const [assignments, setAssignments] = useState([])
+    // the actual student themselves 
     const [student, setStudent] = useState({})
 
+    // stores props of current row when edit is clicked 
     const [gradeModalProps, setGradeModalProps] = useState(defaultObj)
+    // determines weather grade edit modal should be opened or closed 
     const [gradeModalOpen, setGradeModalOpen] = useState()
 
+    // makes sure user wants to delete item 
     const [deleteModalOpen, setDeleteModalOpen] = useState(false)
 
+    // id of the item to delete to pass to the api 
     const [deleteItem, setDeleteItem] = useState('')
 
+    // opens the modal to add data on the datagrid toolbar 
     const [editModalOpen, setEditModalOpen] = useState(false)
 
+    // the data to add to the database 
     const [addedData, setAddedData] = useState(defaultObjII)
-
-    //const [editModalOpen, setEditModalOpen]
     
     useEffect(() => {
         (async () => {
@@ -64,25 +57,36 @@ export default function Individual() {
             renderCell: (cellValues) => {
                 return (
                     <div>
-                    <IconButton sx={{height: 24, width: 24}} onClick={(e) => handleEditClick(e, cellValues)}>
-                        <EditIcon sx={{height: 15}} />
-                    </IconButton>
-                    <IconButton sx={{height: 24, width: 24}} onClick={e => handleDeleteClick(e, cellValues)} >
-                            <DeleteIcon sx={{height: 15}} />
+                        <IconButton sx={{height: 24, width: 24}} onClick={(e) => handleEditClick(e, cellValues)}>
+                            <EditIcon sx={{height: 15}} />
                         </IconButton>
-                        </div>
+                        <IconButton sx={{height: 24, width: 24}} onClick={e => handleDeleteClick(e, cellValues)} >
+                                <DeleteIcon sx={{height: 15}} />
+                        </IconButton>
+                    </div>
             )
         }}
     ]
 
-    
-
+    // runs when you click edit in specific cell
     function handleEditClick(e, cellVals) {
-        //console.log(cellVals.row)
         setGradeModalOpen(!gradeModalOpen)
         setGradeModalProps({...cellVals.row, assignment_date: utils.formatDate(cellVals.row.assignment_date)})
     }
+    // runs when you click delete in certian cell 
+    function handleDeleteClick(e, cellVals) {
+        setDeleteModalOpen(true)
+        setDeleteItem(cellVals.row.assignment_id) // sets the item to delete to the delete id
+    }
 
+    async function deleteItemFromDB() {
+        await utils.deleteAssignment(deleteItem)
+
+        setDeleteItem('')
+        setDeleteModalOpen(false)
+    }
+
+    // passes function to GradeModal -- runs when submit button is clicked 
     async function onSubmitEditModal() {
         let allOk = true 
         for (const property in gradeModalProps) {
@@ -94,35 +98,14 @@ export default function Individual() {
         }
 
         if (allOk) {
-            //console.log(addedData)
-            //console.log(gradeModalProps.assignment_id)
-            const update = await utils.updateAssignment(gradeModalProps.assignment_id, gradeModalProps)
-            //console.log(update)
-
+            await utils.updateAssignment(gradeModalProps.assignment_id, gradeModalProps)
+            
             setGradeModalOpen(false)
             setGradeModalProps(defaultObj)
-            //console.log(addedData)
         } 
     }
 
-    function handleDeleteClick(e, cellVals) {
-        setDeleteModalOpen(true)
-        setDeleteItem(cellVals.row.assignment_id)
-    }
-
-    async function deleteItemFromDB() {
-        const del = await utils.deleteAssignment(deleteItem)
-        //console.log(del)
-        setDeleteItem('')
-        setDeleteModalOpen(false)
-    }
-
-    
-    
-
-    // will add in a new assignment and update the data from here calling to the api and then refreshing the page 
-    
-
+    // adds new assignment based on the current student id 
     async function onSubmit() {
         let allOk = true 
         for (const property in addedData) {
@@ -134,16 +117,12 @@ export default function Individual() {
         }
 
         if (allOk) {
-            //console.log(addedData)
-            const added = await utils.addAssignment(id, addedData)
-            //console.log(added)
+            await utils.addAssignment(id, addedData)
 
             setAddedData(defaultObjII)
             setEditModalOpen(false)
-            //console.log(addedData)
         }
     }
-
 
     return (
         <div style={{ height: 550, width: '100%', fontFamily: 'Roboto' }}>
@@ -151,36 +130,28 @@ export default function Individual() {
             <p><strong>Grade: </strong>{student.grade_level}</p>
             <p>{student.student_email}</p>
             <DataGrid
+                /* the main datagrid that stores the student assignments */
                 rows={assignments}
                 getRowId={(row) => row.assignment_id}
                 rowHeight={25}
                 columns={columns}
                 sx={utils.sxProp}
-                components={{ Toolbar: CustomToolbar }}
+                // THIS CONTAINS THE ADD BUTTON
+                components={{ Toolbar: CustomToolbar }} // in cutom toolbar another empty grade modal is there to add the new assignment 
                 componentsProps={{toolbar: {editModalOpen, setEditModalOpen, addedData, setAddedData, onSubmit}}}
             />
             <GradeModal
+                /* opens when edit button is clicked and loads current row's props */
                 editModalOpen={gradeModalOpen}
                 setEditModalOpen={setGradeModalOpen}
                 onSubmit={onSubmitEditModal}
                 addedData={gradeModalProps}
                 setAddedData={setGradeModalProps}
             />
-            <Modal
-                open={deleteModalOpen}
-            >
+            <Modal open={deleteModalOpen} >
                 <Paper
-                    elevation={3} sx={{
-                        position: 'absolute', 
-                        top: '50%', 
-                        left: '50%', 
-                        transform: 'translate(-50%, -50%)',
-                        width: 550, 
-                        bgcolor: 'whitesmoke',
-                        padding: 5, 
-                        display: 'flex', 
-                        flexDirection: 'column'
-                    }}
+                    elevation={3}
+                    sx={utils.paperSxProps}
                 >
                     <div>
                         <h3 style={{fontFamily: 'Roboto'}}>Are you sure you want to delete this assignment?</h3>
@@ -189,7 +160,6 @@ export default function Individual() {
                         <Button onClick={deleteItemFromDB}>Delete</Button>
                         </div>
                     </div>
-                    
                 </Paper>
             </Modal>
         </div>
